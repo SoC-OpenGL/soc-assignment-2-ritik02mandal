@@ -7,6 +7,7 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void processInput(GLFWwindow *window);
 
 unsigned int loadTexture(const char *path);
@@ -14,6 +15,19 @@ unsigned int loadCubemap(std::vector<std::string> faces);
 
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
+
+//LIGHTENINGS , MAPS
+bool blinn = false;
+bool blinnKeyPressed = false;
+bool dirLight = true;
+bool dirLightKeyPressed = false;
+bool spotLight = false;
+bool spotLightKeyPressed = false;
+bool pointLight = false;
+bool pointLightKeyPressed = false;
+bool np = false;
+bool npPressed = false;
+
 
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -29,43 +43,43 @@ glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 Vertex vertices[] =
 {
-  //Position                    //Color                   //Texcoords
-    glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f),                                   
-    glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec2(1.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f),                                    
-    glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3( 0.0f,  0.0f, -1.0f),                                    
-    glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3( 0.0f,  0.0f, -1.0f),                                    
-    glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3( 0.0f,  0.0f, -1.0f),                                    
-    glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f),                                    
-    glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec2(0.0f, 0.0f), glm::vec3( 0.0f,  0.0f,  1.0f),                                   
-    glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec2(1.0f, 0.0f), glm::vec3( 0.0f,  0.0f,  1.0f),                                   
-    glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 1.0f), glm::vec3( 0.0f,  0.0f,  1.0f),                                   
-    glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 1.0f), glm::vec3( 0.0f,  0.0f,  1.0f),                                   
-    glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec2(0.0f, 1.0f), glm::vec3( 0.0f,  0.0f,  1.0f),                                   
-    glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec2(0.0f, 0.0f), glm::vec3( 0.0f,  0.0f,  1.0f),                                   
-    glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(-1.0f,  0.0f,  0.0f),                                   
-    glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(-1.0f,  0.0f,  0.0f),                                   
-    glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(-1.0f,  0.0f,  0.0f),                                   
-    glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(-1.0f,  0.0f,  0.0f),                                   
-    glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(-1.0f,  0.0f,  0.0f),                                   
-    glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(-1.0f,  0.0f,  0.0f),                                   
-    glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 0.0f), glm::vec3( 1.0f,  0.0f,  0.0f),                                   
-    glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3( 1.0f,  0.0f,  0.0f),                                   
-    glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3( 1.0f,  0.0f,  0.0f),                                   
-    glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3( 1.0f,  0.0f,  0.0f),                                   
-    glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec2(0.0f, 0.0f), glm::vec3( 1.0f,  0.0f,  0.0f),                                   
-    glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 0.0f), glm::vec3( 1.0f,  0.0f,  0.0f),                                   
-    glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3( 0.0f, -1.0f,  0.0f),                                   
-    glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3( 0.0f, -1.0f,  0.0f),                                   
-    glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec2(1.0f, 0.0f), glm::vec3( 0.0f, -1.0f,  0.0f),                                   
-    glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec2(1.0f, 0.0f), glm::vec3( 0.0f, -1.0f,  0.0f),                                   
-    glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec2(0.0f, 0.0f), glm::vec3( 0.0f, -1.0f,  0.0f),                                   
-    glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3( 0.0f, -1.0f,  0.0f),                                   
-    glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3( 0.0f,  1.0f,  0.0f),                                   
-    glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3( 0.0f,  1.0f,  0.0f),                                   
-    glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 0.0f), glm::vec3( 0.0f,  1.0f,  0.0f),                                   
-    glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 0.0f), glm::vec3( 0.0f,  1.0f,  0.0f),                                   
-    glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec2(0.0f, 0.0f), glm::vec3( 0.0f,  1.0f,  0.0f),                                   
-    glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3( 0.0f,  1.0f,  0.0f)                                   
+    //Position                      //Texcoords            //normal                        //tangent vector
+    glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(-1.0f, 0.0f, 0.0f),                                  
+    glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec2(1.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(-1.0f, 0.0f, 0.0f),                                   
+    glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(-1.0f, 0.0f, 0.0f),                                   
+    glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(-1.0f, 0.0f, 0.0f),                                   
+    glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(-1.0f, 0.0f, 0.0f),                                   
+    glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(-1.0f, 0.0f, 0.0f),                                   
+    glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec2(0.0f, 0.0f), glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(1.0f, 0.0f, 0.0f),                                  
+    glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec2(1.0f, 0.0f), glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(1.0f, 0.0f, 0.0f),                                  
+    glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 1.0f), glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(1.0f, 0.0f, 0.0f),                                  
+    glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 1.0f), glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(1.0f, 0.0f, 0.0f),                                  
+    glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec2(0.0f, 1.0f), glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(1.0f, 0.0f, 0.0f),                                  
+    glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec2(0.0f, 0.0f), glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(1.0f, 0.0f, 0.0f),                                  
+    glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f, 0.0f),                                  
+    glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f, 0.0f),                                  
+    glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f, 0.0f),                                  
+    glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f, 0.0f),                                  
+    glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f, 0.0f),                                  
+    glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f, 0.0f),                                  
+    glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 0.0f), glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec3(0.0f, 1.0f, 0.0f),                                  
+    glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec3(0.0f, 1.0f, 0.0f),                                  
+    glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec3(0.0f, 1.0f, 0.0f),                                  
+    glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec3(0.0f, 1.0f, 0.0f),                                  
+    glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec2(0.0f, 0.0f), glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec3(0.0f, 1.0f, 0.0f),                                  
+    glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 0.0f), glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec3(0.0f, 1.0f, 0.0f),                                  
+    glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(-1.0f, 0.0f, 0.0f),                                  
+    glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(-1.0f, 0.0f, 0.0f),                                  
+    glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec2(1.0f, 0.0f), glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(-1.0f, 0.0f, 0.0f),                                  
+    glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec2(1.0f, 0.0f), glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(-1.0f, 0.0f, 0.0f),                                  
+    glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec2(0.0f, 0.0f), glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(-1.0f, 0.0f, 0.0f),                                  
+    glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(-1.0f, 0.0f, 0.0f),                                  
+    glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec3(1.0f, 0.0f, 0.0f),                                  
+    glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec3(1.0f, 0.0f, 0.0f),                                  
+    glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 0.0f), glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec3(1.0f, 0.0f, 0.0f),                                  
+    glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 0.0f), glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec3(1.0f, 0.0f, 0.0f),                                  
+    glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec2(0.0f, 0.0f), glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec3(1.0f, 0.0f, 0.0f),                                  
+    glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3( 0.0f,  1.0f,  0.0f),  glm::vec3(1.0f, 0.0f, 0.0f)                                 
 };
 
 unsigned nrOfVertices = sizeof(vertices) / sizeof(Vertex);
@@ -158,11 +172,11 @@ int main(int argc, char** argv)
     }
   
   glfwMakeContextCurrent(window);
-  glfwSetFramebufferSizeCallback(window, opengl::framebuffer_size_callback);
+  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
   glfwSetCursorPosCallback(window, mouse_callback);
   glfwSetScrollCallback(window, scroll_callback);
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-  glfwSetKeyCallback(window, opengl::key_callback);
+  glfwSetKeyCallback(window,key_callback);
   glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
   glewExperimental = GL_TRUE;
@@ -178,21 +192,27 @@ int main(int argc, char** argv)
   Shader skyShader("Shader/sky_vs.glsl","Shader/sky_fs.glsl");
   Shader lampShader("Shader/light_vs.glsl","Shader/light_fs.glsl");
 
-  unsigned int vbo, vao; 
+  unsigned int VBO, VAO; 
 
-  glGenVertexArrays (1, &vao);
-  glBindVertexArray (vao);
+  glGenVertexArrays (1, &VAO);
+  glBindVertexArray (VAO);
   
-  glGenBuffers (1, &vbo);
-  glBindBuffer (GL_ARRAY_BUFFER, vbo);
+  glGenBuffers (1, &VBO);
+  glBindBuffer (GL_ARRAY_BUFFER, VBO);
   glBufferData (GL_ARRAY_BUFFER, sizeof (vertices), vertices, GL_STATIC_DRAW);
 
+  //POSITION ATTRIBUTE
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
   glEnableVertexAttribArray(0);
+  //TEXTURE ATTRIBUTE
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texcoord));
   glEnableVertexAttribArray(1);
+  //NORMAL ATTRIBUTE
   glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
   glEnableVertexAttribArray(2);
+  //Tangent Attribute
+  glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, tangent));
+  glEnableVertexAttribArray(3);
   
   unsigned int skyVAO, skyVBO;
   glGenVertexArrays(1, &skyVAO);
@@ -206,12 +226,13 @@ int main(int argc, char** argv)
   unsigned int lightVAO;
   glGenVertexArrays(1, &lightVAO);
   glBindVertexArray(lightVAO);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
 
   unsigned int diffuseMap= loadTexture("Texture/container2.jpg");
   unsigned int specularMap = loadTexture("Texture/container2_specular.jpg");
+  unsigned int normalMap = loadTexture("Texture/containernormal.jpg");
 
   std::vector<std::string> faces=
   {
@@ -230,6 +251,7 @@ int main(int argc, char** argv)
   ourShader.use();
   ourShader.setInt("material.diffuse", 0);
   ourShader.setInt("material.specular", 1);
+  ourShader.setInt("material.normal",2);
   
   while (glfwWindowShouldClose(window) == 0)
     {
@@ -246,11 +268,13 @@ int main(int argc, char** argv)
       ourShader.setVec3("viewPos", camera.Position);
       ourShader.setFloat("material.shininess", 32.0f);
       // directional light
+      ourShader.setInt("dirLight.status", dirLight);
       ourShader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
       ourShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
       ourShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
       ourShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
       // point light 1
+      ourShader.setInt("pointLights[0].status", pointLight);
       ourShader.setVec3("pointLights[0].position", pointLightPositions[0]);
       ourShader.setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
       ourShader.setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
@@ -259,6 +283,7 @@ int main(int argc, char** argv)
       ourShader.setFloat("pointLights[0].linear", 0.09);
       ourShader.setFloat("pointLights[0].quadratic", 0.032);
       // point light 2
+      ourShader.setInt("pointLights[1].status", pointLight);
       ourShader.setVec3("pointLights[1].position", pointLightPositions[1]);
       ourShader.setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
       ourShader.setVec3("pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
@@ -267,6 +292,7 @@ int main(int argc, char** argv)
       ourShader.setFloat("pointLights[1].linear", 0.09);
       ourShader.setFloat("pointLights[1].quadratic", 0.032);
       // point light 3
+      ourShader.setInt("pointLights[2].status", pointLight);
       ourShader.setVec3("pointLights[2].position", pointLightPositions[2]);
       ourShader.setVec3("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
       ourShader.setVec3("pointLights[2].diffuse", 0.8f, 0.8f, 0.8f);
@@ -275,6 +301,7 @@ int main(int argc, char** argv)
       ourShader.setFloat("pointLights[2].linear", 0.09);
       ourShader.setFloat("pointLights[2].quadratic", 0.032);
       // point light 4
+      ourShader.setInt("pointLights[3].status", pointLight);
       ourShader.setVec3("pointLights[3].position", pointLightPositions[3]);
       ourShader.setVec3("pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
       ourShader.setVec3("pointLights[3].diffuse", 0.8f, 0.8f, 0.8f);
@@ -283,6 +310,7 @@ int main(int argc, char** argv)
       ourShader.setFloat("pointLights[3].linear", 0.09);
       ourShader.setFloat("pointLights[3].quadratic", 0.032);
       // spotLight
+      ourShader.setInt("spotLight.status", spotLight);
       ourShader.setVec3("spotLight.position", camera.Position);
       ourShader.setVec3("spotLight.direction", camera.Front);
       ourShader.setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
@@ -301,14 +329,21 @@ int main(int argc, char** argv)
       // world transformation
       glm::mat4 model = glm::mat4(1.0f);
       ourShader.setMat4("model", model);
+
+      ourShader.setInt("blinn", blinn);
+      ourShader.setInt("np", np);
+
       // bind diffuse map
       glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D, diffuseMap);
       // bind specular map
       glActiveTexture(GL_TEXTURE1);
       glBindTexture(GL_TEXTURE_2D, specularMap);
+      // Bind Normal Map
+      glActiveTexture(GL_TEXTURE2);
+      glBindTexture(GL_TEXTURE_2D, normalMap);
       // render containers
-      glBindVertexArray(vao);
+      glBindVertexArray(VAO);
 
       for (unsigned int i = 0; i < 10; i++)
       {
@@ -350,8 +385,8 @@ int main(int argc, char** argv)
       glfwPollEvents();
     }
 
-  glDeleteVertexArrays(1, &vbo);
-  glDeleteBuffers(1, &vao);
+  glDeleteVertexArrays(1, &VBO);
+  glDeleteBuffers(1, &VAO);
   glDeleteVertexArrays(1, &skyVAO);
   glDeleteBuffers(1, &skyVAO);
 
@@ -372,7 +407,67 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+        camera.ProcessKeyboard(DOWN, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+        camera.ProcessKeyboard(UP, deltaTime);
+
+    if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS && !blinnKeyPressed) 
+    {
+        blinn = !blinn;
+        blinnKeyPressed = true;
+    }
+    if (glfwGetKey(window, GLFW_KEY_B) == GLFW_RELEASE) 
+    {
+        blinnKeyPressed = false;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS && !spotLightKeyPressed) 
+    {
+        spotLight = !spotLight;
+        spotLightKeyPressed = true;
+    }
+    if (glfwGetKey(window, GLFW_KEY_I) == GLFW_RELEASE) 
+    {
+        spotLightKeyPressed = false;
+    }
+    if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && !dirLightKeyPressed) 
+    {
+        dirLight = !dirLight;
+        dirLightKeyPressed = true;
+    }
+    if (glfwGetKey(window, GLFW_KEY_O) == GLFW_RELEASE) 
+    {
+        dirLightKeyPressed = false;
+    }
+    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && !pointLightKeyPressed) 
+    {
+        pointLight = !pointLight;
+        pointLightKeyPressed = true;
+    }
+    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_RELEASE) 
+    {
+        pointLightKeyPressed = false;
+    }
+        if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS && !npPressed) 
+    {
+        np = !np;
+        npPressed = true;
+    }
+    if (glfwGetKey(window, GLFW_KEY_N) == GLFW_RELEASE) 
+    {
+        npPressed = false;
+    }
 }
+
+//!GLFW keyboard callback
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+  //!Close the window if the ESC key was pressed
+  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    glfwSetWindowShouldClose(window, GL_TRUE);
+}
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {

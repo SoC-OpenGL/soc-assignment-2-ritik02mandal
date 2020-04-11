@@ -27,7 +27,7 @@ unsigned int vbo, vao, EBO;
 
 Vertex vertices[] =
 {
-  //Position                    //Color                   //Texcoords
+  //Position                        //Texcoords              //NORMALS
     glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(1.f,0.f,0.f),  glm::vec2(0.0f, 0.0f),
     glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec3(1.f,0.f,0.f),  glm::vec2(1.0f, 0.0f),
     glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec3(1.f,0.f,0.f),  glm::vec2(1.0f, 1.0f),
@@ -254,6 +254,11 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+        camera.ProcessKeyboard(DOWN, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+        camera.ProcessKeyboard(UP, deltaTime);
+
 }
 
 // glfw: whenever the mouse moves, this callback is called

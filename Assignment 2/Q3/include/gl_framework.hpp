@@ -13,7 +13,7 @@
 #include <iostream>
 #include <math.h>
 
-#include <signal.h>
+#include <signal.h>//GLCAll()
 
 #define ASSERT(x) if(!(x)) raise(SIGTRAP);
 #define GLCall(x) GLClearError();\
@@ -43,10 +43,6 @@ namespace opengl
  
   //!GLFW Error Callback
   void error_callback(int error, const char* description);
-  //!GLFW framebuffer resize callback
-  void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-  //!GLFW keyboard callback
-  void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 };
 
 struct Vertex
@@ -54,6 +50,7 @@ struct Vertex
 	glm::vec3 position;
 	glm::vec2 texcoord;
 	glm::vec3 normal;
+	glm::vec3 tangent;
 };
 
 #endif

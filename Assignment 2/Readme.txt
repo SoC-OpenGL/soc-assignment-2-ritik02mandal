@@ -13,10 +13,11 @@ E : Moves Upward
 Q : Moves Downward
 
 Use Mouse to Look around
-Usr the Mouse scroll to zoom in and out
+Use the Mouse scroll to zoom in and out
 
+**For Q3 only**
 I : Toggle Spotlight
 O : Toggle Direction Light
 P : Toggle Point Lights
-
-N : Toggle the NormalMap feature
+B : Switch between Phong and Blinn-Phong shading models
+N : Toggle to see the very fine NormalMap feature
